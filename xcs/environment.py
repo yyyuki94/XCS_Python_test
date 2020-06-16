@@ -16,20 +16,21 @@ class Environment(metaclass=ABCMeta):
     
 # マルチプレクサ問題の環境クラス
 class MuxProblemEnvironment(Environment):
-    def __init__(self, N_addr, max_iter=10000):
+    def __init__(self, N_addr, max_iter=1000):
         self.k = N_addr
         self.N = self.k + 2 ** self.k
         self.max_iter = max_iter
-        self.bit_array = np.random.randint(0, 2, (self.max_iter, self.N), dtype=bool)
+        self.data = np.loadtxt(f"data/Mux-{self.N}.csv", delimiter=",")
+        self.X = self.data[:, :-1]
+        self.y = self.data[:, -1]
+        self.time_table = np.random.choice(range(len(self.data)), max_iter)
         
     def get_situation(self, t):
-        return self.bit_array[t, :]
+        return self.X[self.time_table[t], :]
         
     def exec_action(self, t, act, reward=1000):
-        idx_true = self.__bits_to_int(self.bit_array[t, 0:self.k])
-        res_true = self.bit_array[t, self.k + idx_true]
-        
-        ret = reward if act == res_true else 0
+        true_val = self.y[self.time_table[t]]
+        ret = reward if act == true_val else 0
             
         return ret
     
@@ -44,13 +45,13 @@ class MuxProblemEnvironment(Environment):
         idx = self.__idx_current
         self.__idx_current += 1
             
-        return self.bit_array[idx]
+        return self.data[self.time_table[idx]]
     
     def __getitem__(self, idx):
-        return self.bit_array[idx]
+        return self.data[self.time_table[idx]]
     
     def __len__(self):
-        return len(self.bit_array)
+        return len(self.time_table)
     
     def __bits_to_int(self, bits_list):
         def mypackbits(X, reverse=True):
