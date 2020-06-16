@@ -1,0 +1,90 @@
+import sys, random, itertools, copy
+import numpy as np
+
+from abc import ABCMeta, abstractmethod
+
+from xcs.population import Population
+from xcs.classifier import Classifier
+
+class MatchSet:
+    def __init__(self, population: Population, sigma: np.ndarray, theta_mna: int,
+                 P_s: float, time):
+        self.M = []
+        self.n_act = population.n_act
+        while len(self.M) == 0:
+            for cl in population:
+                if self.__does_match(cl, sigma):
+                    self.M.append(cl)
+            if self.__unique_act().shape[0] < theta_mna:
+                cl_c = self.__gen_covering_clf(sigma, P_s, time)
+                population.append(cl_c)
+                population.delete_from_population()
+                self.M = []
+                
+    def __iter__(self):
+        self.__idx_current = 0
+        return self
+    
+    def __next__(self):
+        if self.__idx_current == len(self):
+            raise StopIteration()
+            
+        idx = self.__idx_current
+        self.__idx_current += 1
+            
+        return self.M[idx]
+    
+    def __getitem__(self, idx):
+        return self.M[idx]
+    
+    def __len__(self):
+        return len(self.M)
+
+    def __does_match(self, cl, sigma):
+        for x_cl, x_s in zip(cl["condition"], sigma):
+            if (x_cl != 2) and (x_cl != x_s):
+                return False
+            return True
+        
+    def __gen_covering_clf(self, sigma, P_s, time):
+        acts = self.__unique_act()
+        cl = Classifier(len(sigma), self.n_act, time)
+        
+        for i in range(len(cl["condition"])):
+            if np.random.rand() < P_s:
+                cl["condition"][i] = 2
+            else:
+                cl["condition"][i] = sigma[i]
+                
+        while True:
+            act_tmp = np.random.randint(0, 2, self.n_act, dtype=bool)
+            if len(acts) == 0 or not np.apply_along_axis(lambda x: np.array_equal(x, act_tmp), 1, acts).all():
+                break
+        
+        cl["action"] = act_tmp.copy()
+        
+        return cl
+        
+    def __unique_act(self):
+        acts = []
+        for cl in self.M:
+            acts.append(cl["action"])
+            
+        if len(acts) != 0:
+            acts = np.unique(acts, axis=0)
+        
+        return np.array(acts)
+    
+    def get_list_of_clfattr(self, key):
+        tmp = []
+        for i in range(len(self)):
+            tmp.append(self[i][key])
+        return np.array(tmp)
+    
+    def action_match(self, act):
+        acts = self.get_list_of_clfattr("action")
+        idxs = np.arange(len(acts))
+        acts = np.apply_along_axis(lambda x: np.allclose(x, act), 1, acts)
+        
+        idxs = idxs[acts]
+        return idxs
