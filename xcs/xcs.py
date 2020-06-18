@@ -1,7 +1,5 @@
-import sys, random, itertools, copy
+import copy
 import numpy as np
-
-from abc import ABCMeta, abstractmethod
 
 from xcs.rlcomponent import QlearnLikeRLComponent
 from xcs.gacomponent import SimpleGAComponent
@@ -11,8 +9,9 @@ from xcs.actionset import PredictArray, ActionSet
 from xcs.environment import Environment
 from xcs.classifier import Classifier
 
+
 class XCS:
-    def __init__(self, env: Environment, N=100, beta=0.1, alpha=0.1, eps_0=0.01, nu=5, 
+    def __init__(self, env: Environment, N=100, beta=0.1, alpha=0.1, eps_0=0.01, nu=5,
                  gamma=0.71, theta_ga=25, chi=0.5, mu=0.01, theta_del=20,
                  delta=0.1, theta_sub=20, P_s=0.33, p_I=np.finfo(np.float32).eps,
                  e_I=np.finfo(np.float32).eps, f_I=np.finfo(np.float32).eps,
@@ -38,23 +37,23 @@ class XCS:
         Classifier.p_I = p_I
         Classifier.e_I = e_I
         Classifier.f_I = f_I
-        
+
         self.env = env
         self.rp = QlearnLikeRLComponent(theta_mna, P_s, p_explr, alpha, beta, eps_0,
                                         nu, theta_sub, do_actionset_subsumption)
         self.ga = SimpleGAComponent(theta_ga, chi, mu, do_ga_subsumption)
-        
+
         self.t = 0
         self.num_iter = 0
         self.max_iter = env.max_iter
-        
+
         self.Pop = Population(N, len(env[0]), 1, theta_del, delta, empty=True)
-        
+
     def run_experiment(self):
         before_rho = 0
         before_A = None
         before_sigma = None
-        
+
         while True:
             sigma = self.env.get_situation(self.t)
             M = MatchSet(self.Pop, sigma, self.theta_mna, self.P_s, time=self.t)
@@ -62,13 +61,13 @@ class XCS:
             act = PA.select_action(self.p_explr)
             A = ActionSet(M, act)
             rho = self.env.exec_action(self.t, act)
-                        
-            if(before_A is not None):
+
+            if before_A is not None:
                 P = before_rho + self.gamma * max(PA)
                 self.rp.parameter_update(before_A, P, self.Pop)
                 self.ga.run_evolve(before_A, before_sigma, self.Pop)
-            
-            if(self.env.is_end_problem()):
+
+            if self.env.is_end_problem():
                 P = rho
                 self.rp.parameter_update(A, P, self.Pop)
                 self.ga.run_evolve(A, sigma, self.Pop)
@@ -76,7 +75,7 @@ class XCS:
                 before_A = copy.deepcopy(A)
                 before_rho = rho
                 before_sigma = sigma
-            
+
             # print(f"{self.num_iter}: {len(self.Pop)}")
             print(f"========== Population: {len(self.Pop)} ==========")
             self.Pop.print()

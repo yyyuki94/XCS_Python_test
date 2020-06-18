@@ -5,7 +5,7 @@ class Classifier:
     p_I = np.finfo(np.float32).eps
     e_I = np.finfo(np.float32).eps
     f_I = np.finfo(np.float32).eps
-    
+
     def __init__(self, L: int, n_act: int, time: int, random=False):
         self.condition = np.zeros(L, dtype=np.uint8) if not random else np.random.randint(0, 3, L, dtype=np.uint8)
         self.action = np.zeros(n_act, dtype=bool)
@@ -15,18 +15,18 @@ class Classifier:
         self.experience = 0
         self.time_stamp = time
         self.act_size = 1
-        self.numeriosity = 1
-        
+        self.numerosity = 1
+
     def initialize(self):
         self.condition = np.zeros(len(self.condition), dtype=np.uint8)
         self.action = np.zeros(len(self.action), dtype=bool)
-        
+
     def __str__(self):
         return str(self.__dict__)
 
     def __repr__(self):
         return str(self.__dict__)
-    
+
     def __getitem__(self, key):
         return self.__dict__[key]
 
@@ -41,7 +41,7 @@ class Classifier:
         f = f"{self.fitness:6.2f}"
         e = f"{self.error:6.2f}"
         exp = f"{self.experience:05d}"
-        n = f"{self.numeriosity:05d}"
+        n = f"{self.numerosity:05d}"
         out = [c, ":", a, "=>", p, "　　", "e=", e, ", F=", f, ', Exp=', exp, ', N=', n]
         out = "".join(out)
         print(out)

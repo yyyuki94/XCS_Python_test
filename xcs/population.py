@@ -51,17 +51,17 @@ class Population:
 
     def delete_from_population(self):
         def deletion_vote(cl, ave_fitness):
-            vote = cl["act_size"] * cl["numeriosity"]
+            vote = cl["act_size"] * cl["numerosity"]
             if (cl["experience"] > self.theta_del) and \
-                    (cl["fitness"] / cl["numeriosity"] < self.delta * ave_fitness):
-                vote = vote * ave_fitness / (cl["fitness"] / cl["numeriosity"])
+                    (cl["fitness"] / cl["numerosity"] < self.delta * ave_fitness):
+                vote = vote * ave_fitness / (cl["fitness"] / cl["numerosity"])
 
             return vote
 
         if len(self) <= self.N:
             return
 
-        ave_fitness = np.sum(self.get_list_of_clfattr("fitness")) / np.sum(self.get_list_of_clfattr("numeriosity"))
+        ave_fitness = np.sum(self.get_list_of_clfattr("fitness")) / np.sum(self.get_list_of_clfattr("numerosity"))
 
         vote_sum = 0
         for cl in self:
@@ -72,8 +72,8 @@ class Population:
         for cl in self:
             vote_sum = vote_sum + deletion_vote(cl, ave_fitness)
             if vote_sum > choice_point:
-                if cl["numeriosity"] > 1:
-                    cl["numeriosity"] -= 1
+                if cl["numerosity"] > 1:
+                    cl["numerosity"] -= 1
                 else:
                     del self.clf_list[self.__idx_current - 1]
 
