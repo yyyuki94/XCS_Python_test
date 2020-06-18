@@ -5,10 +5,10 @@ from xcs.matchset import MatchSet
 
 
 class ActionSet:
-    def __init__(self, match_set: MatchSet, act: np.ndarray):
+    def __init__(self, match_set: MatchSet, act: int):
         self.A = []
         for cl in match_set:
-            if (cl["action"] == act).all():
+            if cl["action"] == act:
                 self.A.append(cl)
 
     def __iter__(self):
@@ -37,10 +37,8 @@ class ActionSet:
 
 
 class PredictArray:
-    act_bool = np.array([False, True])
-
     def __init__(self, match_set: MatchSet):
-        self.act_all = np.array(list(itertools.product(self.act_bool, repeat=len(match_set[0]["action"]))))
+        self.act_all = np.arange(match_set.act_min, match_set.act_max+1)
         self.PA = np.zeros(self.act_all.shape[0])
         self.PA[:] = np.nan
         self.FSA = np.zeros(self.act_all.shape[0])
@@ -77,7 +75,7 @@ class PredictArray:
         return len(self.PA)
 
     def __get_matched_idx(self, act):
-        idx = np.arange(len(self.act_all))[(self.act_all == act).all(axis=1)]
+        idx = np.arange(len(self.act_all))[self.act_all == act]
         return idx
 
     def select_action(self, p_explr):

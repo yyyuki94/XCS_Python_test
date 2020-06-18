@@ -4,13 +4,14 @@ from xcs.classifier import Classifier
 
 
 class Population:
-    def __init__(self, N: int, L: int, n_act: int, theta_del, delta, empty=True):
+    def __init__(self, N: int, L: int, theta_del, delta, empty=True, act_min=0, act_max=1):
         self.N = N
         self.L = L
-        self.n_act = n_act
         self.theta_del = theta_del
         self.delta = delta
-        self.clf_list = [] if empty else [Classifier(L, n_act, 0, random=True) for _ in range(N)]
+        self.clf_list = [] if empty else [Classifier(L, 0, random=True) for _ in range(N)]
+        self.act_min = act_min
+        self.act_max = act_max
 
     def __iter__(self):
         self.__idx_current = 0

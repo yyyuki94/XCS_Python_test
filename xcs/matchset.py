@@ -6,11 +6,12 @@ from abc import ABCMeta, abstractmethod
 from xcs.population import Population
 from xcs.classifier import Classifier
 
+
 class MatchSet:
-    def __init__(self, population: Population, sigma: np.ndarray, theta_mna: int,
-                 P_s: float, time):
+    def __init__(self, population: Population, sigma: np.ndarray, theta_mna: int, P_s: float, time):
         self.M = []
-        self.n_act = population.n_act
+        self.act_min = population.act_min
+        self.act_max = population.act_max
         while len(self.M) == 0:
             for cl in population:
                 if self.__does_match(cl, sigma):
@@ -47,8 +48,8 @@ class MatchSet:
         return True
 
     def __gen_covering_clf(self, sigma, P_s, time):
-        acts = self.__unique_act()
-        cl = Classifier(len(sigma), self.n_act, time)
+        acts = self.__unique_act().flatten()
+        cl = Classifier(len(sigma), time)
 
         for i in range(len(cl["condition"])):
             if np.random.rand() < P_s:
@@ -56,12 +57,11 @@ class MatchSet:
             else:
                 cl["condition"][i] = sigma[i]
 
-        while True:
-            act_tmp = np.random.randint(0, 2, self.n_act, dtype=bool)
-            if len(acts) == 0 or not np.apply_along_axis(lambda x: np.array_equal(x, act_tmp), 1, acts).all():
-                break
+        act_all = set(np.arange(self.act_min, self.act_max+1))
+        act_tmp = list(act_all - set(acts))
+        act_tmp = np.random.choice(act_tmp, 1)
 
-        cl["action"] = act_tmp.copy()
+        cl["action"] = act_tmp[0]
 
         return cl
 
@@ -71,9 +71,9 @@ class MatchSet:
             acts.append(cl["action"])
 
         if len(acts) != 0:
-            acts = np.unique(acts, axis=0)
+            acts = np.unique(acts)
 
-        return np.array(acts)
+        return np.array(acts).flatten()
 
     def get_list_of_clfattr(self, key):
         tmp = []
@@ -81,10 +81,3 @@ class MatchSet:
             tmp.append(self[i][key])
         return np.array(tmp)
 
-    def action_match(self, act):
-        acts = self.get_list_of_clfattr("action")
-        idxs = np.arange(len(acts))
-        acts = np.apply_along_axis(lambda x: np.allclose(x, act), 1, acts)
-
-        idxs = idxs[acts]
-        return idxs

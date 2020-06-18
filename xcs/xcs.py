@@ -47,7 +47,7 @@ class XCS:
         self.num_iter = 0
         self.max_iter = env.max_iter
 
-        self.Pop = Population(N, len(env[0]), 1, theta_del, delta, empty=True)
+        self.Pop = Population(N, len(env[0]), theta_del, delta, empty=True)
 
     def run_experiment(self):
         before_rho = 0

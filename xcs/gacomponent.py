@@ -1,4 +1,4 @@
-import sys, random, itertools, copy
+import copy
 import numpy as np
 
 from abc import ABCMeta, abstractmethod
@@ -7,7 +7,7 @@ from xcs.actionset import ActionSet
 from xcs.population import Population
 
 
-class GAComponent:
+class GAComponent(metaclass=ABCMeta):
     @abstractmethod
     def run_evolve(self, A: ActionSet, sigma, P: Population):
         pass
@@ -26,6 +26,7 @@ class SimpleGAComponent:
         self.mu = mu
         self.do_ga_subsumption = do_ga_subsumption
         self.t = 0
+        self.possible_act = None
 
     def __offspring(self, A: ActionSet):
         fitness_sum = 0
@@ -64,9 +65,8 @@ class SimpleGAComponent:
             if i >= len(cl["condition"]):
                 break
         if np.random.rand() < self.mu:
-            possible_act = np.array([False, True]).reshape(-1, 1)
-            select_idx = np.random.randint(0, len(possible_act))
-            cl["action"] = possible_act[select_idx].copy()
+            select_idx = np.random.randint(0, len(self.possible_act))
+            cl["action"] = self.possible_act[select_idx]
 
     def __could_subsume(self, cl):
         if cl["experience"] > self.theta_sub:
@@ -88,7 +88,7 @@ class SimpleGAComponent:
         return True
 
     def __does_subsume(self, cl_sub, cl_tos):
-        if (cl_sub["action"] & cl_tos["action"]).all():
+        if cl_sub["action"] == cl_tos["action"]:
             if self.__could_subsume(cl_sub) and self.__is_more_general(cl_sub, cl_tos):
                 return True
 
@@ -96,13 +96,15 @@ class SimpleGAComponent:
 
     def __insert_in_population(self, cl, P: Population):
         for c in P:
-            if (c["condition"] == cl["condition"]).all() and (c["action"] == cl["action"]).all():
+            if (c["condition"] == cl["condition"]).all() and c["action"] == cl["action"]:
                 c["numerosity"] += 1
                 return
         P.append(cl)
 
     def run_evolve(self, A: ActionSet, sigma, P: Population):
         sum_t = np.sum([cl["time_stamp"] * cl["numerosity"] for cl in A]) / np.sum([cl["numerosity"] for cl in A])
+        self.possible_act = np.arange(P.act_min, P.act_max+1)
+
         if self.t - sum_t > self.theta_ga:
             for cl in A:
                 cl["time_stamp"] = self.t
