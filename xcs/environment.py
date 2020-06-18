@@ -13,6 +13,10 @@ class Environment(metaclass=ABCMeta):
     def exec_action(self, act, reward):
         pass
 
+    @abstractmethod
+    def is_end_problem(self):
+        pass
+
     
 # マルチプレクサ問題の環境クラス
 class MuxProblemEnvironment(Environment):
@@ -27,6 +31,9 @@ class MuxProblemEnvironment(Environment):
         
     def get_situation(self, t):
         return self.X[self.time_table[t], :]
+
+    def is_end_problem(self):
+        return True
         
     def exec_action(self, t, act, reward=1000):
         true_val = self.y[self.time_table[t]]

@@ -44,7 +44,7 @@ class MatchSet:
         for x_cl, x_s in zip(cl["condition"], sigma):
             if (x_cl != 2) and (x_cl != x_s):
                 return False
-            return True
+        return True
         
     def __gen_covering_clf(self, sigma, P_s, time):
         acts = self.__unique_act()
@@ -80,11 +80,3 @@ class MatchSet:
         for i in range(len(self)):
             tmp.append(self[i][key])
         return np.array(tmp)
-    
-    def action_match(self, act):
-        acts = self.get_list_of_clfattr("action")
-        idxs = np.arange(len(acts))
-        acts = np.apply_along_axis(lambda x: np.allclose(x, act), 1, acts)
-        
-        idxs = idxs[acts]
-        return idxs

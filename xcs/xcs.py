@@ -45,7 +45,8 @@ class XCS:
         self.ga = SimpleGAComponent(theta_ga, chi, mu, do_ga_subsumption)
         
         self.t = 0
-        self.t_end = env.max_iter
+        self.num_iter = 0
+        self.max_iter = env.max_iter
         
         self.Pop = Population(N, len(env[0]), 1, theta_del, delta, empty=True)
         
@@ -67,7 +68,7 @@ class XCS:
                 self.rp.parameter_update(before_A, P, self.Pop)
                 self.ga.run_evolve(before_A, before_sigma, self.Pop)
             
-            if(self.t >= self.t_end - 1):
+            if(self.env.is_end_problem()):
                 P = rho
                 self.rp.parameter_update(A, P, self.Pop)
                 self.ga.run_evolve(A, sigma, self.Pop)
@@ -76,9 +77,10 @@ class XCS:
                 before_rho = rho
                 before_sigma = sigma
             
-            print(f"{self.t}: {self.Pop[:]}")
+            print(f"{self.num_iter}: {self.Pop[:]}")
 
-            if self.t >= self.t_end - 1:
+            self.t += 1
+            self.num_iter += 1
+
+            if self.num_iter > self.max_iter - 1:
                 break
-            else:
-                self.t += 1
