@@ -18,8 +18,10 @@ class GAComponent:
 
 
 class SimpleGAComponent:
-    def __init__(self, theta_ga, chi, mu, do_ga_subsumption):
+    def __init__(self, eps_0, theta_ga, theta_sub, chi, mu, do_ga_subsumption):
+        self.eps_0 = eps_0
         self.theta_ga = theta_ga
+        self.theta_sub = theta_sub
         self.chi = chi
         self.mu = mu
         self.do_ga_subsumption = do_ga_subsumption
@@ -28,7 +30,7 @@ class SimpleGAComponent:
     def __offspring(self, A: ActionSet):
         fitness_sum = 0
         for cl in A:
-            fitness += cl["fitness"]
+            fitness_sum += cl["fitness"]
         choice_point = np.random.rand() * fitness_sum
         fitness_sum = 0
         for cl in A:
@@ -37,8 +39,8 @@ class SimpleGAComponent:
                 return cl
 
     def __apply_crossover(self, cl1, cl2):
-        x = np.random.rand() * (len(cl1["condition"]) + 1)
-        y = np.random.rand() * (len(cl1["condition"]) + 1)
+        x = np.random.rand() * (len(cl1["condition"]))
+        y = np.random.rand() * (len(cl1["condition"]))
 
         if x > y:
             x, y = y, x
@@ -47,7 +49,7 @@ class SimpleGAComponent:
             if x <= i < y:
                 cl1["condition"][i], cl2["condition"][i] = cl2["condition"][i], cl1["condition"][i]
             i += 1
-            if i > y:
+            if i >= y:
                 break
 
     def __apply_mutation(self, cl, sigma):
@@ -59,10 +61,10 @@ class SimpleGAComponent:
                 else:
                     cl["condition"][i] = 2
                 i += 1
-            if i > len(cl["condition"]):
+            if i >= len(cl["condition"]):
                 break
         if np.random.rand() < self.mu:
-            possible_act = np.array(list(itertools.product([False, True], repeat=len(cl[0]["action"]))))
+            possible_act = np.array([False, True]).reshape(-1, 1)
             select_idx = np.random.randint(0, len(possible_act))
             cl["action"] = possible_act[select_idx].copy()
 
@@ -86,7 +88,7 @@ class SimpleGAComponent:
         return True
 
     def __does_subsume(self, cl_sub, cl_tos):
-        if (cl_sub["Action"] & cl_tos["Action"]).all():
+        if (cl_sub["action"] & cl_tos["action"]).all():
             if self.__could_subsume(cl_sub) and self.__is_more_general(cl_sub, cl_tos):
                 return True
 

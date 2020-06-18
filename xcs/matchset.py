@@ -1,8 +1,10 @@
+import sys, random, itertools, copy
 import numpy as np
+
+from abc import ABCMeta, abstractmethod
 
 from xcs.population import Population
 from xcs.classifier import Classifier
-
 
 class MatchSet:
     def __init__(self, population: Population, sigma: np.ndarray, theta_mna: int,
@@ -78,3 +80,11 @@ class MatchSet:
         for i in range(len(self)):
             tmp.append(self[i][key])
         return np.array(tmp)
+
+    def action_match(self, act):
+        acts = self.get_list_of_clfattr("action")
+        idxs = np.arange(len(acts))
+        acts = np.apply_along_axis(lambda x: np.allclose(x, act), 1, acts)
+
+        idxs = idxs[acts]
+        return idxs

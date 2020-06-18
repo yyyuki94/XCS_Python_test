@@ -41,7 +41,7 @@ class XCS:
         self.env = env
         self.rp = QlearnLikeRLComponent(theta_mna, P_s, p_explr, alpha, beta, eps_0,
                                         nu, theta_sub, do_actionset_subsumption)
-        self.ga = SimpleGAComponent(theta_ga, chi, mu, do_ga_subsumption)
+        self.ga = SimpleGAComponent(eps_0, theta_ga, theta_sub, chi, mu, do_ga_subsumption)
 
         self.t = 0
         self.num_iter = 0
@@ -82,6 +82,7 @@ class XCS:
             print(f"========== End {self.num_iter} ==========")
 
             self.t += 1
+            self.ga.t += 1
             self.num_iter += 1
 
             if self.num_iter > self.max_iter - 1:
