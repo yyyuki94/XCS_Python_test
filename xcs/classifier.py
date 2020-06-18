@@ -32,3 +32,16 @@ class Classifier:
 
     def __setitem__(self, key, value):
         self.__dict__[key] = value
+
+    def print(self):
+        c = "".join(map(str, self.condition))
+        c = c.replace("2", "#")
+        a = "".join(map(str, self.action.astype(int)))
+        p = f"{self.prediction:10.2f}"
+        f = f"{self.fitness:6.2f}"
+        e = f"{self.error:6.2f}"
+        exp = f"{self.experience:05d}"
+        n = f"{self.numeriosity:05d}"
+        out = [c, ":", a, "=>", p, "　　", "e=", e, ", F=", f, ', Exp=', exp, ', N=', n]
+        out = "".join(out)
+        print(out)

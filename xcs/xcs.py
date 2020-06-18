@@ -77,7 +77,10 @@ class XCS:
                 before_rho = rho
                 before_sigma = sigma
             
-            print(f"{self.num_iter}: {self.Pop[:]}")
+            # print(f"{self.num_iter}: {len(self.Pop)}")
+            print(f"========== Population: {len(self.Pop)} ==========")
+            self.Pop.print()
+            print(f"========== End {self.num_iter} ==========")
 
             self.t += 1
             self.num_iter += 1

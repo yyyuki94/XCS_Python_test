@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 from xcs.actionset import ActionSet
 from xcs.population import Population
 
+
 # 強化学習部の抽象クラス
 class RLComponent(metaclass=ABCMeta):    
     @abstractmethod
@@ -32,7 +33,7 @@ class QlearnLikeRLComponent(RLComponent):
         acc_k = np.zeros(len(A))
         
         for i, cl in enumerate(A):
-            if(cl["error"] < self.eps_0):
+            if cl["error"] < self.eps_0:
                 acc_k[i] = 1
             else:
                 acc_k[i] = self.alpha * (cl["error"] / self.eps_0) ** (- self.nu)
@@ -41,34 +42,34 @@ class QlearnLikeRLComponent(RLComponent):
             cl["fitness"] += self.beta * (acc_k[i] * cl["numeriosity"] / sum_ac - cl["fitness"])
     
     def __could_subsume(self, cl):
-        if(cl["experience"] > self.theta_sub):
-            if(cl["error"] < self.eps_0):
+        if cl["experience"] > self.theta_sub:
+            if cl["error"] < self.eps_0:
                 return True
         return False
     
     def __is_more_general(self, cl_gen, cl_spec):
-        if(np.sum(cl_gen["condition"] == 2) <= np.sum(cl_spec["condition"])):
+        if np.sum(cl_gen["condition"] == 2) <= np.sum(cl_spec["condition"]):
             return False
         i = 0
         while True:
-            if(cl_gen["condition"][i] != 2 and cl_gen["condition"][i] != cl_spec["condition"][i]):
+            if cl_gen["condition"][i] != 2 and cl_gen["condition"][i] != cl_spec["condition"][i]:
                 return False
             i += 1
             
-            if(i < len(cl_gen["condition"])):
+            if i < len(cl_gen["condition"]):
                 break
         return True
     
     def __do_action_subsumption(self, A: ActionSet, P: Population):
         cl = None
         for c in A:
-            if(self.__could_subsume(c)):
+            if self.__could_subsume(c):
                 if((cl is not None) or (np.sum(c["condition"]) == 2) > np.sum(c["condition"]) == 2) or \
-                    ((np.sum(c["condition"]) == 2) == np.sum(c["condition"]) == 2) and (np.random.rand() < 0.5):
+                 ((np.sum(c["condition"]) == 2) == np.sum(c["condition"]) == 2) and (np.random.rand() < 0.5):
                     cl = c
-        if(cl is not None):
+        if cl is not None:
             for c in A:
-                if(self.__is_more_general(cl, c)):
+                if self.__is_more_general(cl, c):
                     cl["numeriosity"] += c["numeriosity"]
                     A.remove(c)
                     P.remove(c)
@@ -88,6 +89,5 @@ class QlearnLikeRLComponent(RLComponent):
                 cl["error"] = cl["error"] + self.beta * (np.abs(P - cl["prediction"]) - cl["error"])
                 cl["act_size"] = cl["act_size"] + self.beta * (n_sum - cl["act_size"])
         self.__update_fitness(A)
-        if(self.do_act_subsumption):
-            self.__do_action_subsumptiono(A, Pop)
-        
+        if self.do_act_subsumption:
+            self.__do_action_subsumption(A, Pop)

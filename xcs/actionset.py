@@ -29,6 +29,11 @@ class ActionSet:
     def __len__(self):
         return len(self.A)
 
+    def remove(self, clf):
+        for c in self.A:
+            if (c["condition"] == clf["condition"]).all():
+                self.A.remove(c)
+
 class PredictArray:
     act_bool = np.array([False, True])
 
