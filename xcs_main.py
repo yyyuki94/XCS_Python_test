@@ -7,3 +7,4 @@ if __name__ == '__main__':
               chi=0.8, mu=0.04, p_I=0.01, e_I=0.01, f_I=0.01,
               beta=0.2, do_ga_subsumption=True, do_actionset_subsumption=True)
     xcs.run_experiment()
+    xcs.Pop.output_csv('./result.csv')

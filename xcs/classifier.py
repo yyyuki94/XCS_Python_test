@@ -22,7 +22,17 @@ class Classifier:
         self.action = 0
 
     def __str__(self):
-        return str(self.__dict__)
+        c = "".join(map(str, self.condition))
+        c = c.replace("2", "#")
+        a = str(self.action)
+        p = f"{self.prediction:.2f}"
+        f = f"{self.fitness:.2f}"
+        e = f"{self.error:.2f}"
+        exp = f"{self.experience:d}"
+        n = f"{self.numerosity:d}"
+        outputs = [c, a, p, e, f, exp, n]
+
+        return ",".join(outputs)
 
     def __repr__(self):
         return str(self.__dict__)

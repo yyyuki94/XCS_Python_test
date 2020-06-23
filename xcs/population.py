@@ -50,13 +50,24 @@ class Population:
         for c in self:
             c.print()
 
-    def delete_from_population(self):
-        def deletion_vote(cl, ave_fitness):
-            vote = cl["act_size"] * cl["numerosity"]
-            if (cl["experience"] > self.theta_del) and \
-                    (cl["fitness"] / cl["numerosity"] < self.delta * ave_fitness):
-                vote = vote * ave_fitness / (cl["fitness"] / cl["numerosity"])
+    def sort_population(self, key='prediction'):
+        self.clf_list = sorted(self.clf_list, key=lambda c: c[key])[::-1]
 
+    def output_csv(self, filepath):
+        header = ["Condition", 'Action', 'Prediction', 'Error', 'Fitness', 'Experience', 'Numerosity']
+        self.sort_population()
+
+        with open(filepath, mode='w') as f:
+            f.write(",".join(header) + '\n')
+            for i in range(len(self)):
+                f.write(str(self[i]) + '\n')
+
+    def delete_from_population(self):
+        def deletion_vote(cl_tmp, ave_tmp):
+            vote = cl_tmp["act_size"] * cl_tmp["numerosity"]
+            if (cl_tmp["experience"] > self.theta_del) and \
+                    (cl_tmp["fitness"] / cl_tmp["numerosity"] < self.delta * ave_tmp):
+                vote = vote * ave_tmp / (cl_tmp["fitness"] / cl_tmp["numerosity"])
             return vote
 
         if len(self) <= self.N:
