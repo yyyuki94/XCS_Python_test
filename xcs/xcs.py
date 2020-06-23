@@ -77,9 +77,10 @@ class XCS:
                 before_sigma = sigma
 
             # print(f"{self.num_iter}: {len(self.Pop)}")
-            print(f"========== Population: {len(self.Pop)} ==========")
-            self.Pop.print()
-            print(f"========== End {self.num_iter} ==========")
+            if (self.num_iter + 1) % 100 == 0:
+                print(f"========== Population: {len(self.Pop)} ==========")
+                self.Pop.print()
+                print(f"========== End {self.num_iter+1} ==========")
 
             self.t += 1
             self.ga.t += 1

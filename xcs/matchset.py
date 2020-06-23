@@ -1,7 +1,4 @@
-import sys, random, itertools, copy
 import numpy as np
-
-from abc import ABCMeta, abstractmethod
 
 from xcs.population import Population
 from xcs.classifier import Classifier
