@@ -51,7 +51,9 @@ class PredictArray:
             self.FSA[act_idx] += cl["fitness"]
 
         for act in range(len(self.act_all)):
-            if self.FSA[act] != 0:
+            if np.isnan(self.PA[act]):
+                self.PA[act] = 0.0
+            if self.FSA[act] > np.finfo(float).eps:
                 self.PA[act] = self.PA[act] / self.FSA[act]
 
     def __iter__(self):
@@ -78,8 +80,8 @@ class PredictArray:
         return idx
 
     def select_action(self, p_explr):
-        if np.random.rand() < p_explr:
-            idx = np.random.choice(np.arange(len(self.PA))[np.logical_not(np.isnan(self.PA))])
+        if np.random.rand() < p_explr and np.sum(self.PA) > 0:
+            idx = np.random.choice(np.arange(len(self.PA)), p=self.PA/np.sum(self.PA))
             return self.act_all[idx]
         else:
             return self.act_all[np.nanargmax(self.PA)]

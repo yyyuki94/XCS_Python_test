@@ -1,5 +1,6 @@
 from xcs.xcs import XCS
 from xcs.environment import MuxProblemEnvironment
+import pandas as pd
 
 if __name__ == '__main__':
     mux = MuxProblemEnvironment(2, max_iter=10000)
@@ -9,3 +10,7 @@ if __name__ == '__main__':
     xcs.run_experiment()
     xcs.Pop.output_csv('./result.csv')
     mux.save_rewards('./log-reward.csv')
+    reward = mux.log_table.reshape(-1, 1)
+    sma = pd.DataFrame(reward)
+    sma = sma.rolling(100).mean().fillna(0)
+    sma.to_csv('./reward-ma100.csv', header=False, index=False)

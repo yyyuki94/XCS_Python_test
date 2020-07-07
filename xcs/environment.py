@@ -27,7 +27,8 @@ class MuxProblemEnvironment(Environment):
         self.data = np.loadtxt(f"data/Mux-{self.N}.csv", delimiter=",")
         self.X = self.data[:, :-1]
         self.y = self.data[:, -1]
-        self.time_table = np.random.choice(range(len(self.data)), max_iter)
+        # self.time_table = np.random.choice(range(len(self.data)), max_iter)
+        self.time_table = np.arange(max_iter) % len(self.X)
         self.log_table = np.zeros(max_iter)
 
     def get_situation(self, t):
