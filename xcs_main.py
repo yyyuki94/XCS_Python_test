@@ -8,3 +8,4 @@ if __name__ == '__main__':
               beta=0.2, do_ga_subsumption=True, do_actionset_subsumption=True)
     xcs.run_experiment()
     xcs.Pop.output_csv('./result.csv')
+    mux.save_rewards('./log-reward.csv')

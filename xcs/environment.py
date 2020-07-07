@@ -28,6 +28,7 @@ class MuxProblemEnvironment(Environment):
         self.X = self.data[:, :-1]
         self.y = self.data[:, -1]
         self.time_table = np.random.choice(range(len(self.data)), max_iter)
+        self.log_table = np.zeros(max_iter)
 
     def get_situation(self, t):
         return self.X[self.time_table[t], :]
@@ -38,8 +39,12 @@ class MuxProblemEnvironment(Environment):
     def exec_action(self, t, act, reward=1000):
         true_val = self.y[self.time_table[t]]
         ret = reward if act == true_val else 0
+        self.log_table[t] = ret
 
         return ret
+
+    def save_rewards(self, file_path):
+        np.savetxt(file_path, self.log_table.reshape(-1, 1), delimiter=',', fmt='%d')
 
     def __iter__(self):
         self.__idx_current = 0
